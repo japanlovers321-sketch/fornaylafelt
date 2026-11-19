@@ -528,6 +528,7 @@
         let audioCtx = null;
         let isPlayingMusic = false;
         let melodyTimer = null;
+        let hasUserInteractedForAudio = false;
 
         const hbdNotes = [
             { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.2 }, { f: 293.66, d: 0.55 }, { f: 261.63, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 329.63, d: 0.95 },
@@ -544,6 +545,7 @@
                 audioCtx.resume();
             }
 
+            stopChiptuneHBD();
             isPlayingMusic = true;
             partyIcon.textContent = '🔊';
             partyLabel.textContent = 'Stop Musik';
@@ -584,10 +586,12 @@
             isPlayingMusic = false;
             clearTimeout(melodyTimer);
             partyIcon.textContent = '🎵';
-            partyLabel.textContent = 'Party & Musik';
+            partyLabel.textContent = 'Party & Music';
         }
 
-        btnParty.addEventListener('click', () => {
+        btnParty.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hasUserInteractedForAudio = true;
             triggerConfetti(90);
             if (isPlayingMusic) {
                 stopChiptuneHBD();
@@ -596,6 +600,22 @@
                 playChiptuneHBD();
                 showToast('🎶 Happy Birthday 8-bit chiptune playing!');
             }
+        });
+
+        // Auto-start confetti when page opens, and auto-play music on first tap/click anywhere
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                triggerConfetti(85);
+            }, 250);
+
+            const unlockAndPlayMusic = () => {
+                if (hasUserInteractedForAudio) return;
+                hasUserInteractedForAudio = true;
+                playChiptuneHBD();
+            };
+
+            document.addEventListener('pointerdown', unlockAndPlayMusic, { once: true });
+            document.addEventListener('keydown', unlockAndPlayMusic, { once: true });
         });
 
         /**
