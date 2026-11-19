@@ -358,28 +358,28 @@
             <!-- Button 1: Vibe / Theme Switcher -->
             <button type="button" id="btn-theme" style="background-color: var(--accent-1);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
                 <span class="text-xl leading-none">🎨</span>
-                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">Ganti Vibe</span>
+                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">Change Vibe</span>
                 <span id="theme-name-label" class="text-[10px] font-bold uppercase opacity-75">Skater Pastel</span>
             </button>
 
             <!-- Button 2: Pop Confetti & Chiptune HBD Music -->
             <button type="button" id="btn-party" style="background-color: var(--accent-3);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
                 <span id="party-icon" class="text-xl leading-none">🎵</span>
-                <span id="party-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Party & Musik</span>
+                <span id="party-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Party & Music</span>
                 <span class="text-[10px] font-bold uppercase opacity-75">8-Bit + Confetti</span>
             </button>
 
             <!-- Button 3: Add Random Tomboy-Cute Sticker -->
             <button type="button" id="btn-sticker" style="background-color: var(--accent-2);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
                 <span class="text-xl leading-none">🛹</span>
-                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">+ Tambah Stiker</span>
+                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">+ Add Stickers</span>
                 <span class="text-[10px] font-bold uppercase opacity-75">Drag & Drop</span>
             </button>
 
             <!-- Button 4: Save / Download Card as PNG -->
             <button type="button" id="btn-download" class="arcade-btn bg-white hover:bg-slate-50 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
                 <span class="text-xl leading-none">📸</span>
-                <span id="download-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Simpan Kartu</span>
+                <span id="download-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Save Card</span>
                 <span class="text-[10px] font-bold uppercase opacity-75">Download PNG</span>
             </button>
 
@@ -429,7 +429,7 @@
                 candleSmoke.classList.remove('hidden');
                 candleLabel.textContent = 'Wish Granted! ✨';
                 triggerConfetti(55);
-                showToast('🎂 Yeay! Lilin ditiup, semoga wish-nya terkabul!');
+                showToast('🎂 Yeayy! Lilin ditiup, semoga wish-nya terkabul!');
             } else {
                 candleFlame.classList.remove('hidden');
                 candleSmoke.classList.add('hidden');
@@ -494,7 +494,7 @@
 
             el.addEventListener('dblclick', () => {
                 el.remove();
-                showToast('🗑️ Stiker dihapus.');
+                showToast('🗑️ Sticker deleted.');
             });
         }
 
@@ -516,7 +516,7 @@
 
             makeStickerDraggable(sticker);
             stickerLayer.appendChild(sticker);
-            showToast(`✨ Stiker ${randomEmoji} ditambahkan! Geser posisinya sesukamu.`);
+            showToast(`✨ Sticker ${randomEmoji} added! posisinya disesuaikam aja ya, Nay.`);
         });
 
         /**
