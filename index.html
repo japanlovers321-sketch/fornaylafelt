@@ -266,8 +266,8 @@
 
                         <!-- Avatar / Uploaded Image Display -->
                         <div id="avatar-display" class="relative w-full h-[165px] rounded-xl overflow-hidden border-2 border-slate-950 bg-slate-800 flex items-center justify-center">
-                            <!-- Default Cute-Tomboy SVG Illustration -->
-                            <div id="preset-svg-container" class="w-full h-full flex items-center justify-center p-2" style="background-color: var(--accent-1);">
+                            <!-- Default Cute-Tomboy SVG Illustration (Hidden when custom photo is active) -->
+                            <div id="preset-svg-container" class="hidden w-full h-full flex items-center justify-center p-2" style="background-color: var(--accent-1);">
                                 <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[3px_3px_0px_#111317]">
                                     <circle cx="100" cy="105" r="72" fill="#FFFDF7" stroke="#111317" stroke-width="4"/>
                                     <path d="M55 82 L46 42 L82 64 Z" fill="#282D37" stroke="#111317" stroke-width="4" stroke-linejoin="round"/>
@@ -290,8 +290,8 @@
                                     <rect x="150" y="88" width="16" height="34" rx="8" fill="#FF9EBB" stroke="#111317" stroke-width="4"/>
                                 </svg>
                             </div>
-                            <!-- Ganti src="images/foto-kamu.jpg" dan hapus "hidden" jika mau pakai foto permanen -->
-                            <img id="uploaded-photo" src="" alt="Birthday Person" class="hidden w-full h-full object-cover" />
+                            <!-- Uploaded Photo -->
+                            <img id="uploaded-photo" src="aokieunji.png" alt="Birthday Person" class="w-full h-full object-cover" />
                         </div>
                     </div>
                 </div>
