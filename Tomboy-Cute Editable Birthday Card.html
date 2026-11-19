@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBD Card Maker // Tomboy-Cute Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas for exporting the card as a PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts: Fredoka (Chunky Cute), Space Grotesk (Streetwear/Tech), Plus Jakarta Sans (Clean Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,500;0,700;1,500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        display: ['Fredoka', 'sans-serif'],
+                        street: ['Space Grotesk', 'sans-serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Theme Variables & Aesthetic Utilities */
+        :root {
+            --bg-page: #f4f1ea;
+            --dot-color: #cbd5e1;
+            --card-bg: #1e2229;
+            --card-surface: #282d37;
+            --card-border: #111317;
+            --accent-1: #ff9ebb; /* Baby Pink */
+            --accent-2: #7ce8c3; /* Mint */
+            --accent-3: #ffe07d; /* Butter Yellow */
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --shadow-hard: #111317;
+        }
+
+        /* Theme 2: Denim & Peach */
+        [data-theme="denim"] {
+            --bg-page: #e9eef5;
+            --dot-color: #94a3b8;
+            --card-bg: #1e2d42;
+            --card-surface: #273b56;
+            --card-border: #0f172a;
+            --accent-1: #ffb088; /* Warm Peach */
+            --accent-2: #93c5fd; /* Sky Denim */
+            --accent-3: #fef08a; /* Cream Yellow */
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --shadow-hard: #0f172a;
+        }
+
+        /* Theme 3: Arcade Pop */
+        [data-theme="arcade"] {
+            --bg-page: #f3e8ff;
+            --dot-color: #c084fc;
+            --card-bg: #18181b;
+            --card-surface: #27272a;
+            --card-border: #09090b;
+            --accent-1: #d8b4fe; /* Soft Lavender */
+            --accent-2: #bef264; /* Acid Lime */
+            --accent-3: #67e8f9; /* Cyan Pop */
+            --text-main: #fafafa;
+            --text-muted: #d4d4d8;
+            --shadow-hard: #09090b;
+        }
+
+        /* Theme 4: Matcha Skate */
+        [data-theme="matcha"] {
+            --bg-page: #f2f5ee;
+            --dot-color: #a3b18a;
+            --card-bg: #232b24;
+            --card-surface: #2f3a30;
+            --card-border: #131814;
+            --accent-1: #b7e4c7; /* Matcha Cream */
+            --accent-2: #ffcad4; /* Strawberry Milk */
+            --accent-3: #ffd166; /* Honey */
+            --text-main: #f8fafc;
+            --text-muted: #d1d5db;
+            --shadow-hard: #131814;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 22px 22px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.35s ease;
+            overflow-x: hidden;
+        }
+
+        /* Subtle denim/canvas weave overlay on the card */
+        .canvas-texture {
+            background-color: var(--card-bg);
+            background-image: 
+                repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 4px),
+                repeating-linear-gradient(-45deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 4px);
+            border: 3px solid var(--card-border);
+            box-shadow: 8px 8px 0px var(--shadow-hard);
+            transition: all 0.35s ease;
+        }
+
+        .card-inner-box {
+            background-color: var(--card-surface);
+            border: 2.5px solid var(--card-border);
+            transition: background-color 0.35s ease;
+        }
+
+        /* Chunky Neo-Brutalist / Arcade Buttons */
+        .arcade-btn {
+            border: 2.5px solid var(--card-border);
+            box-shadow: 0 5px 0 var(--shadow-hard);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.25s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .arcade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 var(--shadow-hard);
+        }
+
+        .arcade-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--shadow-hard);
+        }
+
+        /* Editable Fields Styling */
+        [contenteditable="true"] {
+            outline: none;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            cursor: text;
+        }
+
+        [contenteditable="true"]:hover {
+            background-color: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 0 2px dashed rgba(255, 255, 255, 0.35);
+        }
+
+        [contenteditable="true"]:focus {
+            background-color: rgba(255, 255, 255, 0.11);
+            box-shadow: 0 0 0 2px var(--accent-2);
+        }
+
+        /* Clean mode when capturing screenshot */
+        .export-mode [contenteditable="true"]:hover,
+        .export-mode [contenteditable="true"]:focus {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        .export-mode .no-export {
+            display: none !important;
+        }
+
+        /* Draggable Sticker Styling */
+        .draggable-sticker {
+            position: absolute;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.45));
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 30;
+        }
+
+        .draggable-sticker:hover {
+            transform: scale(1.12) rotate(4deg);
+        }
+
+        .draggable-sticker:active {
+            cursor: grabbing;
+            transform: scale(1.18);
+        }
+
+        /* Candle Flame Flicker Animation */
+        @keyframes flicker {
+            0%, 100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+            25% { transform: scale(1.08, 0.94) rotate(2deg); opacity: 0.92; }
+            50% { transform: scale(0.95, 1.06) rotate(-1deg); opacity: 1; }
+            75% { transform: scale(1.04, 0.96) rotate(3deg); opacity: 0.95; }
+        }
+
+        .flame-active {
+            animation: flicker 0.65s infinite alternate ease-in-out;
+            transform-origin: bottom center;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(-4deg); }
+            50% { transform: translateY(-5px) rotate(2deg); }
+        }
+
+        .float-badge {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+
+        /* Custom Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between py-6 px-4 sm:px-6 text-slate-900">
+
+    <!-- Confetti Overlay -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Top Mini Status Pill -->
+    <header class="w-full max-w-2xl flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div class="inline-flex items-center gap-2 bg-white border-2 border-slate-900 rounded-full px-3.5 py-1.5 shadow-[3px_3px_0px_#111317]">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-street text-xs sm:text-sm font-bold tracking-tight uppercase text-slate-900">
+                DIY Birthday Zine // v2.6
+            </span>
+        </div>
+
+        <div class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur border-2 border-slate-900 rounded-full px-3 py-1 text-xs font-semibold text-slate-700 shadow-[3px_3px_0px_#111317]">
+            <span>✏️ Klik teks di kartu buat edit langsung!</span>
+        </div>
+    </header>
+
+    <!-- MAIN EDITABLE BIRTHDAY CARD -->
+    <main class="w-full max-w-2xl flex-grow flex flex-col items-center justify-center my-auto">
+        <div id="birthday-card" class="canvas-texture relative w-full rounded-3xl p-5 sm:p-8 text-white overflow-hidden">
+            
+            <!-- Decorative Corner Rivets / Streetwear Tape -->
+            <div class="w-16 h-5 bg-white/20 backdrop-blur-sm border border-white/30 rotate-[-35deg] absolute -top-1 -left-5 pointer-events-none"></div>
+            <div class="w-16 h-5 bg-white/20 backdrop-blur-sm border border-white/30 rotate-[35deg] absolute -top-1 -right-5 pointer-events-none"></div>
+
+            <!-- Top Card Header Bar: Issue Tag & Interactive Candle -->
+            <div class="flex items-center justify-between gap-2 mb-5 relative z-10">
+                <div class="flex items-center gap-2">
+                    <span id="badge-pill" style="background-color: var(--accent-2); color: #111317;" class="font-street text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full border-2 border-slate-950 shadow-[2px_2px_0px_#000]">
+                        ★ LEVEL UP DAY
+                    </span>
+                    <span contenteditable="true" id="card-date" class="font-street text-xs sm:text-sm font-semibold opacity-80 px-2 py-0.5">
+                        19 NOV // SPECIAL EDITION
+                    </span>
+                </div>
+
+                <!-- Mini Interactive Candle Widget -->
+                <button type="button" id="candle-btn" title="Klik buat tiup/nyalain lilin!" class="group flex items-center gap-2 bg-black/30 hover:bg-black/45 border-2 border-white/20 rounded-2xl px-3 py-1.5 transition cursor-pointer">
+                    <div class="relative flex flex-col items-center">
+                        <!-- Flame SVG -->
+                        <svg id="candle-flame" class="w-4 h-5 flame-active transition-opacity duration-300" viewBox="0 0 24 32" fill="none">
+                            <path d="M12 2C12 2 20 11 20 19C20 24.5 16.4 28 12 28C7.6 28 4 24.5 4 19C4 11 12 2 12 2Z" fill="#FF9F1C"/>
+                            <path d="M12 9C12 9 16 14.5 16 19.5C16 22.5 14.2 24.5 12 24.5C9.8 24.5 8 22.5 8 19.5C8 14.5 12 9 12 9Z" fill="#FFF3B0"/>
+                        </svg>
+                        <!-- Smoke puff when blown out -->
+                        <span id="candle-smoke" class="hidden text-[11px] leading-none animate-bounce">💨</span>
+                        <!-- Candle Stick -->
+                        <div class="w-2.5 h-4 rounded-sm bg-gradient-to-b from-pink-300 to-sky-300 border border-slate-950"></div>
+                    </div>
+                    <span id="candle-label" class="font-street text-[11px] font-bold uppercase tracking-wide text-amber-200 group-hover:text-white">
+                        Make a Wish!
+                    </span>
+                </button>
+            </div>
+
+            <!-- Main Card Content Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 items-center relative z-10">
+                
+                <!-- Left Column: Photo / Tomboy-Cute Avatar Frame -->
+                <div class="md:col-span-5 flex flex-col items-center">
+                    <div class="card-inner-box relative w-full max-w-[230px] aspect-square rounded-2xl p-2.5 shadow-[5px_5px_0px_var(--shadow-hard)] rotate-[-2deg] hover:rotate-0 transition-transform duration-300">
+                        <!-- Polaroid / Game Cartridge Top Notch -->
+                        <div class="flex items-center justify-between mb-1.5 px-1">
+                            <div class="flex gap-1">
+                                <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                <span class="w-2 h-2 rounded-full bg-amber-300"></span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            </div>
+                            <span class="font-street text-[10px] font-bold tracking-widest opacity-60">PLAYER 01</span>
+                        </div>
+
+                        <!-- Avatar / Uploaded Image Display -->
+                        <div id="avatar-display" class="relative w-full h-[165px] rounded-xl overflow-hidden border-2 border-slate-950 bg-slate-800 flex items-center justify-center">
+                            <!-- Default Cute-Tomboy SVG Illustration (Cool Cat with Headphones & Beanie) -->
+                            <div id="preset-svg-container" class="w-full h-full flex items-center justify-center p-2" style="background-color: var(--accent-1);">
+                                <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[3px_3px_0px_#111317]">
+                                    <!-- Starburst BG -->
+                                    <circle cx="100" cy="105" r="72" fill="#FFFDF7" stroke="#111317" stroke-width="4"/>
+                                    <!-- Cat Ears -->
+                                    <path d="M55 82 L46 42 L82 64 Z" fill="#282D37" stroke="#111317" stroke-width="4" stroke-linejoin="round"/>
+                                    <path d="M145 82 L154 42 L118 64 Z" fill="#282D37" stroke="#111317" stroke-width="4" stroke-linejoin="round"/>
+                                    <path d="M58 75 L53 51 L74 65 Z" fill="#FF9EBB"/>
+                                    <path d="M142 75 L147 51 L126 65 Z" fill="#FF9EBB"/>
+                                    <!-- Cat Head -->
+                                    <ellipse cx="100" cy="106" rx="52" ry="44" fill="#282D37" stroke="#111317" stroke-width="4"/>
+                                    <!-- Streetwear Beanie -->
+                                    <path d="M54 84 C54 52, 146 52, 146 84 Z" fill="#7CE8C3" stroke="#111317" stroke-width="4"/>
+                                    <rect x="49" y="76" width="102" height="14" rx="7" fill="#FFE07D" stroke="#111317" stroke-width="4"/>
+                                    <!-- Cool Sunglasses -->
+                                    <rect x="60" y="96" width="34" height="20" rx="5" fill="#111317"/>
+                                    <rect x="106" y="96" width="34" height="20" rx="5" fill="#111317"/>
+                                    <line x1="94" y1="103" x2="106" y2="103" stroke="#111317" stroke-width="4"/>
+                                    <line x1="66" y1="101" x2="76" y2="111" stroke="#7CE8C3" stroke-width="3" stroke-linecap="round"/>
+                                    <line x1="112" y1="101" x2="122" y2="111" stroke="#7CE8C3" stroke-width="3" stroke-linecap="round"/>
+                                    <!-- Cute Cheek Blush & Smirk -->
+                                    <ellipse cx="64" cy="122" rx="7" ry="4" fill="#FF9EBB" opacity="0.85"/>
+                                    <ellipse cx="136" cy="122" rx="7" ry="4" fill="#FF9EBB" opacity="0.85"/>
+                                    <path d="M91 124 Q100 132 110 122" fill="none" stroke="#FFFDF7" stroke-width="3.5" stroke-linecap="round"/>
+                                    <!-- Chunky Headphones -->
+                                    <path d="M44 102 C44 52, 156 52, 156 102" fill="none" stroke="#111317" stroke-width="7" stroke-linecap="round"/>
+                                    <rect x="34" y="88" width="16" height="34" rx="8" fill="#FF9EBB" stroke="#111317" stroke-width="4"/>
+                                    <rect x="150" y="88" width="16" height="34" rx="8" fill="#FF9EBB" stroke="#111317" stroke-width="4"/>
+                                </svg>
+                            </div>
+                            <!-- Uploaded User Photo (Hidden by default) -->
+                            <img id="uploaded-photo" src="" alt="Birthday Person" class="hidden w-full h-full object-cover" />
+                        </div>
+
+                        <!-- Photo / Badge Switcher Mini Controls (Hidden on PNG export) -->
+                        <div class="no-export flex items-center justify-between gap-1.5 mt-2">
+                            <label for="photo-upload" class="flex-1 text-center cursor-pointer bg-white hover:bg-amber-200 text-slate-950 font-street text-[11px] font-bold py-1 px-2 rounded-lg border-2 border-slate-950 transition">
+                                📷 Ganti Foto
+                            </label>
+                            <input type="file" id="photo-upload" accept="image/*" class="hidden" />
+                            <button type="button" id="cycle-avatar-btn" title="Ganti Karakter Lucu" class="bg-slate-900 hover:bg-slate-700 text-white font-street text-[11px] font-bold py-1 px-2.5 rounded-lg border-2 border-slate-950 transition cursor-pointer">
+                                🎲 Icon
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Editable Headline, Recipient, Message & Sender -->
+                <div class="md:col-span-7 flex flex-col justify-between space-y-3.5">
+                    
+                    <!-- Recipient Tag -->
+                    <div>
+                        <span class="font-street text-[11px] uppercase tracking-widest opacity-75 block mb-0.5">FOR MY FAVORITE HUMAN:</span>
+                        <div contenteditable="true" id="recipient-name" style="color: var(--accent-2);" class="font-street text-xl sm:text-2xl font-bold tracking-tight inline-block px-1.5 -ml-1.5">
+                            @bestie_keren ✨
+                        </div>
+                    </div>
+
+                    <!-- Chunky Display Headline -->
+                    <h1 contenteditable="true" id="card-headline" style="color: var(--accent-1);" class="font-display text-3xl sm:text-4xl font-bold leading-[1.1] tracking-tight drop-shadow-[3px_3px_0px_#111317] px-1.5 -ml-1.5">
+                        Happy Birthday, Legend! 🛹⚡
+                    </h1>
+
+                    <!-- Message Body Box -->
+                    <div class="card-inner-box rounded-2xl p-3.5 sm:p-4 shadow-[4px_4px_0px_var(--shadow-hard)]">
+                        <p contenteditable="true" id="card-message" class="font-body text-sm sm:text-[15px] leading-relaxed text-slate-100">
+                            Selamat ulang tahun ya! Semoga tahun ini makin banyak hal seru, rezeki lancar jaya, sehat terus, dan semua wishlist kamu satu-satu tercapai. Stay cool, stay weird, and keep shining! 🚀💖
+                        </p>
+                    </div>
+
+                    <!-- Footer Signature & Mini Doodle Stamp -->
+                    <div class="flex items-center justify-between pt-1">
+                        <div>
+                            <span class="font-street text-[10px] uppercase tracking-widest opacity-70 block">FROM YOURS TRULY,</span>
+                            <span contenteditable="true" id="sender-name" style="color: var(--accent-3);" class="font-display text-lg font-semibold px-1.5 -ml-1.5">
+                                — Sahabatmu ✌️
+                            </span>
+                        </div>
+
+                        <!-- Decorative Tomboy-Cute Stamp -->
+                        <div class="float-badge select-none pointer-events-none">
+                            <div style="border-color: var(--accent-2); color: var(--accent-2);" class="border-2 border-dashed rounded-xl px-2.5 py-1 font-street text-[10px] font-bold uppercase tracking-wider rotate-[6deg]">
+                                100% CERTIFIED COOL
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Sticker Layer (Users can drag stickers around here!) -->
+            <div id="sticker-layer" class="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                <!-- Default starter stickers (pointer-events-auto so they can be dragged) -->
+                <div class="draggable-sticker pointer-events-auto text-3xl sm:text-4xl" style="top: 12%; right: 8%;" title="Geser aku! Klik 2x buat hapus">⚡</div>
+                <div class="draggable-sticker pointer-events-auto text-3xl sm:text-4xl" style="bottom: 10%; left: 6%;" title="Geser aku! Klik 2x buat hapus">🎧</div>
+            </div>
+        </div>
+
+        <!-- Helper Hint for Stickers -->
+        <p id="status-toast" class="mt-3 font-street text-xs font-semibold text-slate-600 text-center min-h-[18px] transition-opacity">
+            💡 Tip: Geser stiker di atas kartu, atau klik 2x stikernya buat hapus.
+        </p>
+    </main>
+
+    <!-- 4 CHUNKY INTERACTIVE CONTROL BUTTONS -->
+    <footer class="w-full max-w-2xl mt-4">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            
+            <!-- Button 1: Vibe / Theme Switcher -->
+            <button type="button" id="btn-theme" style="background-color: var(--accent-1);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
+                <span class="text-xl leading-none">🎨</span>
+                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">Ganti Vibe</span>
+                <span id="theme-name-label" class="text-[10px] font-bold uppercase opacity-75">Skater Pastel</span>
+            </button>
+
+            <!-- Button 2: Pop Confetti & Chiptune HBD Music -->
+            <button type="button" id="btn-party" style="background-color: var(--accent-3);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
+                <span id="party-icon" class="text-xl leading-none">🎵</span>
+                <span id="party-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Party & Musik</span>
+                <span class="text-[10px] font-bold uppercase opacity-75">8-Bit + Confetti</span>
+            </button>
+
+            <!-- Button 3: Add Random Tomboy-Cute Sticker -->
+            <button type="button" id="btn-sticker" style="background-color: var(--accent-2);" class="arcade-btn rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
+                <span class="text-xl leading-none">🛹</span>
+                <span class="font-street text-xs sm:text-sm font-bold tracking-tight">+ Tambah Stiker</span>
+                <span class="text-[10px] font-bold uppercase opacity-75">Drag & Drop</span>
+            </button>
+
+            <!-- Button 4: Save / Download Card as PNG -->
+            <button type="button" id="btn-download" class="arcade-btn bg-white hover:bg-slate-50 rounded-2xl p-3 flex flex-col items-center justify-center gap-1 text-slate-950 cursor-pointer">
+                <span class="text-xl leading-none">📸</span>
+                <span id="download-label" class="font-street text-xs sm:text-sm font-bold tracking-tight">Simpan Kartu</span>
+                <span class="text-[10px] font-bold uppercase opacity-75">Download PNG</span>
+            </button>
+
+        </div>
+    </footer>
+
+    <script>
+        /**
+         * 1. VIBE / THEME SWITCHER
+         * Cycles through 4 curated tomboy-cute colorways
+         */
+        const themes = [
+            { id: 'skater', name: 'Skater Pastel' },
+            { id: 'denim', name: 'Denim & Peach' },
+            { id: 'arcade', name: 'Arcade Pop' },
+            { id: 'matcha', name: 'Matcha Skate' }
+        ];
+        let currentThemeIdx = 0;
+
+        const btnTheme = document.getElementById('btn-theme');
+        const themeNameLabel = document.getElementById('theme-name-label');
+
+        btnTheme.addEventListener('click', () => {
+            currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+            const selected = themes[currentThemeIdx];
+            if (selected.id === 'skater') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', selected.id);
+            }
+            themeNameLabel.textContent = selected.name;
+            showToast(`🎨 Vibe diganti ke: ${selected.name}!`);
+        });
+
+        /**
+         * 2. PRESET TOMBOY-CUTE AVATARS & PHOTO UPLOAD
+         */
+        const presetAvatars = [
+            // 0: Cool Cat with Headphones & Beanie
+            `<svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[3px_3px_0px_#111317]">
+                <circle cx="100" cy="105" r="72" fill="#FFFDF7" stroke="#111317" stroke-width="4"/>
+                <path d="M55 82 L46 42 L82 64 Z" fill="#282D37" stroke="#111317" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M145 82 L154 42 L118 64 Z" fill="#282D37" stroke="#111317" stroke-width="4" stroke-linejoin="round"/>
+                <path d="M58 75 L53 51 L74 65 Z" fill="#FF9EBB"/>
+                <path d="M142 75 L147 51 L126 65 Z" fill="#FF9EBB"/>
+                <ellipse cx="100" cy="106" rx="52" ry="44" fill="#282D37" stroke="#111317" stroke-width="4"/>
+                <path d="M54 84 C54 52, 146 52, 146 84 Z" fill="#7CE8C3" stroke="#111317" stroke-width="4"/>
+                <rect x="49" y="76" width="102" height="14" rx="7" fill="#FFE07D" stroke="#111317" stroke-width="4"/>
+                <rect x="60" y="96" width="34" height="20" rx="5" fill="#111317"/>
+                <rect x="106" y="96" width="34" height="20" rx="5" fill="#111317"/>
+                <line x1="94" y1="103" x2="106" y2="103" stroke="#111317" stroke-width="4"/>
+                <line x1="66" y1="101" x2="76" y2="111" stroke="#7CE8C3" stroke-width="3" stroke-linecap="round"/>
+                <line x1="112" y1="101" x2="122" y2="111" stroke="#7CE8C3" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="64" cy="122" rx="7" ry="4" fill="#FF9EBB" opacity="0.85"/>
+                <ellipse cx="136" cy="122" rx="7" ry="4" fill="#FF9EBB" opacity="0.85"/>
+                <path d="M91 124 Q100 132 110 122" fill="none" stroke="#FFFDF7" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M44 102 C44 52, 156 52, 156 102" fill="none" stroke="#111317" stroke-width="7" stroke-linecap="round"/>
+                <rect x="34" y="88" width="16" height="34" rx="8" fill="#FF9EBB" stroke="#111317" stroke-width="4"/>
+                <rect x="150" y="88" width="16" height="34" rx="8" fill="#FF9EBB" stroke="#111317" stroke-width="4"/>
+            </svg>`,
+            // 1: Retro Handheld Arcade Console
+            `<svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[3px_3px_0px_#111317]">
+                <rect x="44" y="22" width="112" height="156" rx="18" fill="#FFFDF7" stroke="#111317" stroke-width="4.5"/>
+                <rect x="58" y="38" width="84" height="66" rx="10" fill="#282D37" stroke="#111317" stroke-width="4"/>
+                <rect x="66" y="46" width="68" height="50" rx="6" fill="#7CE8C3"/>
+                <text x="100" y="75" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="16" fill="#111317">HBD +1UP</text>
+                <path d="M95 83 L100 79 L105 83 L103 89 L97 89 Z" fill="#FF9EBB" stroke="#111317" stroke-width="2"/>
+                <rect x="66" y="122" width="10" height="30" rx="3" fill="#111317"/>
+                <rect x="56" y="132" width="30" height="10" rx="3" fill="#111317"/>
+                <circle cx="132" cy="128" r="8" fill="#FF9EBB" stroke="#111317" stroke-width="3.5"/>
+                <circle cx="115" cy="142" r="8" fill="#FFE07D" stroke="#111317" stroke-width="3.5"/>
+            </svg>`,
+            // 2: High-Top Skate Sneaker & Star Patch
+            `<svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-[3px_3px_0px_#111317]">
+                <circle cx="100" cy="100" r="74" fill="#FFE07D" stroke="#111317" stroke-width="4"/>
+                <path d="M40 128 L52 65 L92 65 L108 98 L156 108 C166 110, 168 128, 158 134 L40 134 Z" fill="#7CE8C3" stroke="#111317" stroke-width="4.5" stroke-linejoin="round"/>
+                <rect x="36" y="128" width="128" height="14" rx="6" fill="#FFFDF7" stroke="#111317" stroke-width="4"/>
+                <path d="M135 110 C152 110, 164 118, 164 128 L132 128 Z" fill="#FFFDF7" stroke="#111317" stroke-width="4"/>
+                <circle cx="72" cy="102" r="12" fill="#FFFDF7" stroke="#111317" stroke-width="3"/>
+                <polygon points="72,94 74,100 80,100 75,104 77,110 72,106 67,110 69,104 64,100 70,100" fill="#FF9EBB"/>
+                <line x1="94" y1="78" x2="106" y2="76" stroke="#111317" stroke-width="4" stroke-linecap="round"/>
+                <line x1="99" y1="88" x2="111" y2="86" stroke="#111317" stroke-width="4" stroke-linecap="round"/>
+            </svg>`
+        ];
+        let currentAvatarIdx = 0;
+
+        const presetSvgContainer = document.getElementById('preset-svg-container');
+        const uploadedPhoto = document.getElementById('uploaded-photo');
+        const photoUploadInput = document.getElementById('photo-upload');
+        const cycleAvatarBtn = document.getElementById('cycle-avatar-btn');
+
+        cycleAvatarBtn.addEventListener('click', () => {
+            currentAvatarIdx = (currentAvatarIdx + 1) % presetAvatars.length;
+            presetSvgContainer.innerHTML = presetAvatars[currentAvatarIdx];
+            uploadedPhoto.classList.add('hidden');
+            presetSvgContainer.classList.remove('hidden');
+        });
+
+        photoUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                uploadedPhoto.src = event.target.result;
+                presetSvgContainer.classList.add('hidden');
+                uploadedPhoto.classList.remove('hidden');
+                showToast('📸 Foto berhasil dipasang ke kartu!');
+            };
+            reader.readAsDataURL(file);
+        });
+
+        /**
+         * 3. INTERACTIVE CANDLE (BLOW / RELIGHT)
+         */
+        const candleBtn = document.getElementById('candle-btn');
+        const candleFlame = document.getElementById('candle-flame');
+        const candleSmoke = document.getElementById('candle-smoke');
+        const candleLabel = document.getElementById('candle-label');
+        let candleLit = true;
+
+        candleBtn.addEventListener('click', () => {
+            candleLit = !candleLit;
+            if (!candleLit) {
+                candleFlame.classList.add('hidden');
+                candleSmoke.classList.remove('hidden');
+                candleLabel.textContent = 'Wish Granted! ✨';
+                triggerConfetti(55);
+                showToast('🎂 Yeay! Lilin ditiup, semoga wish-nya terkabul!');
+            } else {
+                candleFlame.classList.remove('hidden');
+                candleSmoke.classList.add('hidden');
+                candleLabel.textContent = 'Make a Wish!';
+            }
+        });
+
+        /**
+         * 4. ADD DRAGGABLE TOMBOY-CUTE STICKERS
+         */
+        const stickerPool = ['🛹', '👟', '🎮', '⚡', '💖', '⭐', '🧢', '🎸', '👾', '🍒', '✨', '🔥', '🐱', '💿'];
+        const btnSticker = document.getElementById('btn-sticker');
+        const stickerLayer = document.getElementById('sticker-layer');
+
+        function makeStickerDraggable(el) {
+            let isDragging = false;
+            let startX, startY, initialLeft, initialTop;
+
+            const onStart = (clientX, clientY) => {
+                isDragging = true;
+                const rect = el.getBoundingClientRect();
+                const parentRect = stickerLayer.getBoundingClientRect();
+                initialLeft = rect.left - parentRect.left;
+                initialTop = rect.top - parentRect.top;
+                startX = clientX;
+                startY = clientY;
+                el.style.right = 'auto';
+                el.style.bottom = 'auto';
+                el.style.left = `${initialLeft}px`;
+                el.style.top = `${initialTop}px`;
+            };
+
+            const onMove = (clientX, clientY) => {
+                if (!isDragging) return;
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                el.style.left = `${initialLeft + dx}px`;
+                el.style.top = `${initialTop + dy}px`;
+            };
+
+            const onEnd = () => {
+                isDragging = false;
+            };
+
+            el.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                onStart(e.clientX, e.clientY);
+            });
+            window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+            window.addEventListener('mouseup', onEnd);
+
+            el.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                onStart(touch.clientX, touch.clientY);
+            }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                onMove(touch.clientX, touch.clientY);
+            }, { passive: true });
+            window.addEventListener('touchend', onEnd);
+
+            // Double click/tap to remove sticker
+            el.addEventListener('dblclick', () => {
+                el.remove();
+                showToast('🗑️ Stiker dihapus.');
+            });
+        }
+
+        // Initialize existing stickers
+        document.querySelectorAll('.draggable-sticker').forEach(makeStickerDraggable);
+
+        btnSticker.addEventListener('click', () => {
+            const randomEmoji = stickerPool[Math.floor(Math.random() * stickerPool.length)];
+            const sticker = document.createElement('div');
+            sticker.className = 'draggable-sticker pointer-events-auto text-3xl sm:text-4xl';
+            sticker.textContent = randomEmoji;
+            sticker.title = 'Geser aku! Klik 2x buat hapus';
+
+            // Random position inside card bounds
+            const randTop = 15 + Math.floor(Math.random() * 65);
+            const randLeft = 10 + Math.floor(Math.random() * 75);
+            const randRot = -18 + Math.floor(Math.random() * 36);
+            sticker.style.top = `${randTop}%`;
+            sticker.style.left = `${randLeft}%`;
+            sticker.style.transform = `rotate(${randRot}deg)`;
+
+            makeStickerDraggable(sticker);
+            stickerLayer.appendChild(sticker);
+            showToast(`✨ Stiker ${randomEmoji} ditambahkan! Geser posisinya sesukamu.`);
+        });
+
+        /**
+         * 5. WEB AUDIO API 8-BIT / LO-FI HAPPY BIRTHDAY MELODY + CONFETTI
+         */
+        const btnParty = document.getElementById('btn-party');
+        const partyIcon = document.getElementById('party-icon');
+        const partyLabel = document.getElementById('party-label');
+        let audioCtx = null;
+        let isPlayingMusic = false;
+        let melodyTimer = null;
+
+        // Happy Birthday Notes (Frequency in Hz, Duration in beats)
+        const hbdNotes = [
+            { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.2 }, { f: 293.66, d: 0.55 }, { f: 261.63, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 329.63, d: 0.95 },
+            { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.2 }, { f: 293.66, d: 0.55 }, { f: 261.63, d: 0.55 }, { f: 392.00, d: 0.55 }, { f: 349.23, d: 0.95 },
+            { f: 261.63, d: 0.35 }, { f: 261.63, d: 0.2 }, { f: 523.25, d: 0.55 }, { f: 440.00, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 329.63, d: 0.55 }, { f: 293.66, d: 0.95 },
+            { f: 466.16, d: 0.35 }, { f: 466.16, d: 0.2 }, { f: 440.00, d: 0.55 }, { f: 349.23, d: 0.55 }, { f: 392.00, d: 0.55 }, { f: 349.23, d: 1.1 }
+        ];
+
+        function playChiptuneHBD() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            isPlayingMusic = true;
+            partyIcon.textContent = '🔊';
+            partyLabel.textContent = 'Stop Musik';
+
+            let step = 0;
+            function playNextNote() {
+                if (!isPlayingMusic) return;
+                if (step >= hbdNotes.length) {
+                    stopChiptuneHBD();
+                    return;
+                }
+                const note = hbdNotes[step];
+                const now = audioCtx.currentTime;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle'; // Warm retro game synth tone
+                osc.frequency.setValueAtTime(note.f, now);
+
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.exponentialRampToValueAtTime(0.16, now + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + note.d * 0.9);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + note.d);
+
+                step++;
+                melodyTimer = setTimeout(playNextNote, note.d * 520);
+            }
+
+            playNextNote();
+        }
+
+        function stopChiptuneHBD() {
+            isPlayingMusic = false;
+            clearTimeout(melodyTimer);
+            partyIcon.textContent = '🎵';
+            partyLabel.textContent = 'Party & Musik';
+        }
+
+        btnParty.addEventListener('click', () => {
+            triggerConfetti(90);
+            if (isPlayingMusic) {
+                stopChiptuneHBD();
+                showToast('🔇 Musik dihentikan.');
+            } else {
+                playChiptuneHBD();
+                showToast('🎶 Happy Birthday 8-bit chiptune playing!');
+            }
+        });
+
+        /**
+         * CUSTOM CONFETTI ENGINE (Canvas)
+         */
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctx = confettiCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerConfetti(count = 70) {
+            const colors = ['#FF9EBB', '#7CE8C3', '#FFE07D', '#93C5FD', '#D8B4FE', '#BEF264'];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+                    y: window.innerHeight * 0.55,
+                    vx: (Math.random() - 0.5) * 16,
+                    vy: -Math.random() * 14 - 4,
+                    size: Math.random() * 8 + 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    vRot: (Math.random() - 0.5) * 12,
+                    shape: Math.random() > 0.4 ? 'rect' : 'circle'
+                });
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.38; // Gravity
+                p.vx *= 0.98;
+                p.rotation += p.vRot;
+
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.strokeStyle = '#111317';
+                ctx.lineWidth = 1.5;
+
+                if (p.shape === 'rect') {
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                    ctx.strokeRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                if (p.y > confettiCanvas.height + 30) {
+                    particles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(animateConfetti);
+        }
+        animateConfetti();
+
+        /**
+         * 6. EXPORT / DOWNLOAD CARD AS PNG IMAGE
+         */
+        const btnDownload = document.getElementById('btn-download');
+        const downloadLabel = document.getElementById('download-label');
+        const birthdayCard = document.getElementById('birthday-card');
+
+        btnDownload.addEventListener('click', async () => {
+            // Clear text selection and hide mini upload buttons during snapshot
+            window.getSelection()?.removeAllRanges();
+            document.activeElement?.blur();
+            birthdayCard.classList.add('export-mode');
+            downloadLabel.textContent = 'Menyimpan...';
+
+            try {
+                const canvas = await html2canvas(birthdayCard, {
+                    scale: 2, // High-res Retina export
+                    backgroundColor: null,
+                    useCORS: true
+                });
+
+                const link = document.createElement('a');
+                const recipientClean = document.getElementById('recipient-name').textContent
+                    .replace(/[^a-zA-Z0-9_-]/g, '') || 'bestie';
+                link.download = `HBD-${recipientClean}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                triggerConfetti(60);
+                showToast('✅ Kartu berhasil didownload jadi gambar PNG!');
+            } catch (err) {
+                console.error(err);
+                showToast('⚠️ Gagal export otomatis, coba screenshot layar ya!');
+            } finally {
+                birthdayCard.classList.remove('export-mode');
+                downloadLabel.textContent = 'Simpan Kartu';
+            }
+        });
+
+        /**
+         * Helper Toast Notification
+         */
+        const statusToast = document.getElementById('status-toast');
+        let toastTimeout;
+        function showToast(msg) {
+            statusToast.textContent = msg;
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                statusToast.textContent = '💡 Tip: Geser stiker di atas kartu, atau klik 2x stikernya buat hapus.';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
